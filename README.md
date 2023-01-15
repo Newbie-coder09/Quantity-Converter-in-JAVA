@@ -619,6 +619,7 @@ Check out the code (v0.1):
 Issues (as of v0.1):
 * Some conversions might be incorrect (I've just used the formulae which I got from google)
 * Conversion units are less (I'll add more in next version).
+* Code contain some warnings (simply ignore them).
 * Code may take time to compile as its long.
 
 --> You can download the .jar file from release section and import it in Eclipse or IntelliJ IDE.
