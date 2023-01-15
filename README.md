@@ -23,15 +23,15 @@ Details (About Code):
 * I tried my best to keep it as short as possible.
 * If you need any help regarding the code, contact me on telegram at @SOUL_AYU
 
-Check out the code (0.1):
+Check out the code (v0.1):
 
-  //Importing packages
-  import java.awt.*;
-  import java.awt.event.*;
-  import javax.swing.*;
+  	//Importing packages
+  	import java.awt.*;
+  	import java.awt.event.*;
+  	import javax.swing.*;
 
-  //Creating class
-  public class MyFrame extends JFrame implements ActionListener{
+  	//Creating class
+ 	public class MyFrame extends JFrame implements ActionListener{
   
 	//Initializing and Declaring Variables
 	JComboBox<?> mainOption, option1, option2;
@@ -614,4 +614,13 @@ Check out the code (0.1):
 		}
 	}
 	
- }
+ 	}
+	
+Issues (as of v0.1):
+* Some conversions might be incorrect (I've just used the formulae which I got from google)
+* Conversion units are less (I'll add more in next version).
+* Code may take time to compile as its long.
+
+--> You can download the .jar file from release section and import it in Eclipse or IntelliJ IDE.
+
+Thank You for reading till end, please consider checking my other repos too.
