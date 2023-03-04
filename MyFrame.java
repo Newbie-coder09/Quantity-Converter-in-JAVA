@@ -1,6 +1,8 @@
 //Importing packages
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
+
 import javax.swing.*;
 
 //Creating class
@@ -20,8 +22,129 @@ public class MyFrame extends JFrame implements ActionListener{
 	String power[] = {"Watt", "Kilowatt", "Megawatt", "Horsepower"};
 	String mass[] = {"Gram", "Kilogram", "Metric Ton", "Metric Quintal"};
 	String speed[] = {"Meter/Second", "Km/Hour", "Mile/Hour"};
+	String binary[] = {"Binary", "Grey Code", "BCD", "Excess-3 Code"};
+	String angle[] = {"Degree", "Radian", "Minutes", "Seconds", "Revolution"};
 	boolean num;
 	
+	//Binary to Grey Logic
+	String b2G(String ip) {
+		String op = "" + ip.charAt(0);
+		for(int i=0; i<ip.length()-1; i++) {
+			if(Integer.parseInt(""+ip.charAt(i+1))!=Integer.parseInt(""+ip.charAt(i)))
+				op+="1";
+			else
+				op+="0";
+		}
+		return op;
+	}
+	
+	//Grey to Binary Logic
+	String g2B(String ip) {
+		String op = "" + ip.charAt(0);
+		for(int i=0; i<ip.length()-1; i++) {
+			if(Integer.parseInt(""+ip.charAt(i+1))!=Integer.parseInt(""+op.charAt(i)))
+				op+="1";
+			else
+				op+="0";
+		}
+		return op;
+	}
+	
+	//Binary to Excess 3 Code
+	String b2E3(String ip) {
+		String b[] = {"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100"};
+		String newS = "", op = "";
+		int val=0, c;
+		for(int i=ip.length()-1; i>=0; i--) {
+			newS+=ip.charAt(i);
+		}
+		for(int i=0; i<newS.length(); i++) {
+			val+=Integer.parseInt(""+newS.charAt(i))*Math.pow(2, i);
+		}
+		for(int i=0; i<String.valueOf(val).length(); i++) {
+			c = Integer.parseInt(""+String.valueOf(val).charAt(i))+3;
+		    op+=b[c];
+		}
+		return op;
+	}
+	
+	//Binary to BCD Logic
+	String b2BCD(String ip) {
+		String b[] = {"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001"};
+		String newS = "", op = "";
+		int val=0;
+		for(int i=ip.length()-1; i>=0; i--) {
+			newS+=ip.charAt(i);
+		}
+		for(int i=0; i<newS.length(); i++) {
+			val+=Integer.parseInt(""+newS.charAt(i))*Math.pow(2, i);
+		}
+		for(int i=0; i<String.valueOf(val).length(); i++) {
+			op+=b[Integer.parseInt(""+String.valueOf(val).charAt(i))];
+		}
+		return op;
+	}
+	
+	//BCD to Binary Logic
+	String bcd2B(String s){
+		String op="";
+		int check = 0, check0 = 0, num = 0, sum = 0, mul = 1, rev = 0;
+		for(int i = s.length() - 1; i >= 0; i--){
+			sum += (s.charAt(i) - '0') * mul;
+			mul *= 2;
+			check++;
+			if (check == 4 || i == 0) {
+				if (sum == 0 && check0 == 0){
+					num = 1;
+					check0 = 1;
+				}
+				else {
+					num = num * 10 + sum;
+				}
+				check = 0;
+				sum = 0;
+				mul = 1;
+			}
+		}
+		while (num > 0){
+			rev = rev * 10 + (num % 10);
+			num /= 10;
+		}
+		if (check0 == 1) {
+			int r=rev-1;
+			while(r > 0){    
+				op = r%2 + op;    
+				r = r/2;    
+			}  
+			return op;
+		}
+		while(rev > 0){    
+			op = rev%2 + op;    
+			rev = rev/2;    
+		}  
+		return op;
+	}	
+	
+	//Binary to Excess 3 Code
+	String e32B(String ip) {
+		String op = "";
+		String b[] = {"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100"};
+		while(ip.length()%4!=0) {
+			ip = "0"+ip;
+		}
+		for(int i=0; i<ip.length(); i+=4) {
+			String t = String.valueOf(ip.charAt(i))+String.valueOf(ip.charAt(i+1))+String.valueOf(ip.charAt(i+2))+String.valueOf(ip.charAt(i+3));
+			op+=(Arrays.asList(b).indexOf(t)-3);
+		}
+		int i = Integer.parseInt(op);
+		op = "";
+		while(i > 0){    
+			op = i%2 + op;    
+			i = i/2;    
+		}  
+		return op;
+	}
+		
 	//Function consisting of all the conversion formulas
 	void checkResult() {
 		//If selected quantities are same
@@ -417,29 +540,124 @@ public class MyFrame extends JFrame implements ActionListener{
 					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*3.6));
 			}
 		}
+		
+		//Logic for binary conversion
+		else if(mainOption.getSelectedItem().equals("Binary")) {
+			if(op1.getText().contains("2") || op1.getText().contains("3") || op1.getText().contains("4") || op1.getText().contains("5") || op1.getText().contains("6") || op1.getText().contains("7") || op1.getText().contains("8") || op1.getText().contains("9")) {
+				op2.setText("");
+				lab[3].setText("Wrong Binary Input.");
+			}
+			else if(option1.getSelectedItem().equals("Binary")) {
+				if(option2.getSelectedItem().equals("Grey Code"))
+					op2.setText(b2G(op1.getText()));
+				else if(option2.getSelectedItem().equals("BCD"))
+					op2.setText(b2BCD(op1.getText()));
+				else if(option2.getSelectedItem().equals("Excess-3 Code"))
+					op2.setText(b2E3(op1.getText()));
+			}
+			else if(option1.getSelectedItem().equals("Grey Code")) {
+				if(option2.getSelectedItem().equals("Binary"))
+					op2.setText(g2B(op1.getText()));
+				else if(option2.getSelectedItem().equals("BCD"))
+					op2.setText(b2BCD(g2B(op1.getText())));
+				else if(option2.getSelectedItem().equals("Excess-3 Code"))
+					op2.setText(b2E3(g2B(op1.getText())));
+			}
+			else if(option1.getSelectedItem().equals("BCD")) {
+				if(option2.getSelectedItem().equals("Grey Code"))
+					op2.setText(b2G(bcd2B(op1.getText())));
+				else if(option2.getSelectedItem().equals("Binary"))
+					op2.setText(bcd2B(op1.getText()));
+				else if(option2.getSelectedItem().equals("Excess-3 Code"))
+					op2.setText(b2E3(bcd2B(op1.getText())));
+			}
+			else if(option1.getSelectedItem().equals("Excess-3 Code")) {
+				if(option2.getSelectedItem().equals("Grey Code"))
+					op2.setText(b2G(e32B(op1.getText())));
+				else if(option2.getSelectedItem().equals("Binary"))
+					op2.setText(e32B(op1.getText()));
+				else if(option2.getSelectedItem().equals("BCD"))
+					op2.setText(b2E3(e32B(op1.getText())));
+			}
+		}
+		
+		//Logic for angle conversion
+		else if(mainOption.getSelectedItem().equals("Angle")) {
+			if(option1.getSelectedItem().equals("Degree")) {
+				if(option2.getSelectedItem().equals("Radian"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/57.29578));
+				else if(option2.getSelectedItem().equals("Minutes"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*60));
+				else if(option2.getSelectedItem().equals("Seconds"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*3600));
+				else if(option2.getSelectedItem().equals("Revolution"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/360));
+			}
+			else if(option1.getSelectedItem().equals("Radian")) {
+				if(option2.getSelectedItem().equals("Degree"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*57.29578));
+				else if(option2.getSelectedItem().equals("Minutes"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*60*57.29578));
+				else if(option2.getSelectedItem().equals("Seconds"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*3600*57.29578));
+				else if(option2.getSelectedItem().equals("Revolution"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/360*57.29578));
+			}
+			else if(option1.getSelectedItem().equals("Minutes")) {
+				if(option2.getSelectedItem().equals("Degree"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/60));
+				else if(option2.getSelectedItem().equals("Radian"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/3438));
+				else if(option2.getSelectedItem().equals("Seconds"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*60));
+				else if(option2.getSelectedItem().equals("Revolution"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/21600));
+			}
+			else if(option1.getSelectedItem().equals("Seconds")) {
+				if(option2.getSelectedItem().equals("Degree"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/3600));
+				else if(option2.getSelectedItem().equals("Minutes"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/60));
+				else if(option2.getSelectedItem().equals("Radian"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/206300));
+				else if(option2.getSelectedItem().equals("Revolution"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())/1296000));
+			}
+			else if(option1.getSelectedItem().equals("Revolution")) {
+				if(option2.getSelectedItem().equals("Degree"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*360));
+				else if(option2.getSelectedItem().equals("Minutes"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*21600));
+				else if(option2.getSelectedItem().equals("Seconds"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*1296000));
+				else if(option2.getSelectedItem().equals("Radian"))
+					op2.setText(String.valueOf(Double.parseDouble(op1.getText())*6.283));
+			}
+		}
 	}
 	
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	MyFrame(){
 		
 		//Item list
-		String mainItems[] = {"Mass", "Temperature", "Speed", "Time", "Data", "Length", "Frequency", "Force", "Power"};
+		String mainItems[] = {"Angle", "Binary", "Mass", "Temperature", "Speed", "Time", "Data", "Length", "Frequency", "Force", "Power"};
 		mainOption = new JComboBox(mainItems);
-		mainOption.setSelectedItem("Mass");
+		mainOption.setSelectedItem("Angle");
 		mainOption.addActionListener(this);
 		mainOption.setBounds(20, 70, 250, 25);
 		
 		//Quantity selector
-		option1 = new JComboBox(mass);
-		option2 = new JComboBox(mass);
+		option1 = new JComboBox(angle);
+		option2 = new JComboBox(angle);
 		
-		//Label an =d Buttons
+		//Label and Buttons
 		String labels[] = {"Converter", "Value:", "Result:", ""};
 		String buttons[] = {"Convert", "Theme: Light", "↑↓"};
 		for(int i=0; i<4; i++) {
 			lab[i] = new JLabel(labels[i]);
-			lab[i].setFont(new Font("MV Boli", Font.PLAIN, 15));
+			lab[i].setFont(new Font("Comic Sans MS", Font.PLAIN, 15));
 			lab[i].setForeground(Color.RED);
 			lab[i].setVisible(true);
 			this.add(lab[i]);
@@ -448,7 +666,7 @@ public class MyFrame extends JFrame implements ActionListener{
 				but[i].setForeground(Color.BLACK);
 				but[i].setBackground(new Color(123,100,255));
 				if(i<2)
-					but[i].setFont(new Font("MV Boli", Font.PLAIN, 15));
+					but[i].setFont(new Font("Comic Sans MS", Font.PLAIN, 15));
 				but[i].setFocusable(false);
 				but[i].setVisible(true);
 				but[i].addActionListener(this);
@@ -459,16 +677,16 @@ public class MyFrame extends JFrame implements ActionListener{
 		//Space for value of 1st quantity
 		op1 = new JTextField();
 		op1.setBounds(20, 145, 250, 30);
-		op1.setFont(new Font("MV Boli", Font.PLAIN, 15));
+		op1.setFont(new Font("Comic Sans MS", Font.PLAIN, 15));
 		
 		//2nd quantity or result
 		op2 = new JTextField();
 		op2.setEditable(false);
 		op2.setBounds(20, 225, 250, 30);
-		op2.setFont(new Font("MV Boli", Font.PLAIN, 15));
+		op2.setFont(new Font("Comic Sans MS", Font.PLAIN, 15));
 		
 		//Setting positions and other parameters
-		lab[0].setFont(new Font("MV Boli", Font.PLAIN, 20));
+		lab[0].setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
 		lab[0].setBounds(85, 10, 250, 30);
 		lab[3].setBounds(20, 35, 250, 30);
 		lab[1].setBounds(20, 110, 100, 30);
@@ -501,6 +719,7 @@ public class MyFrame extends JFrame implements ActionListener{
 
 	//Action performed method for main item selection and button
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void actionPerformed(ActionEvent e) {
 		
 		//Main drop-down list
@@ -541,12 +760,20 @@ public class MyFrame extends JFrame implements ActionListener{
 				option1.setModel(new javax.swing.DefaultComboBoxModel(speed));
 				option2.setModel(new javax.swing.DefaultComboBoxModel(speed));
 			}
+			else if(mainOption.getSelectedItem().equals("Binary")) {
+				option1.setModel(new javax.swing.DefaultComboBoxModel(binary));
+				option2.setModel(new javax.swing.DefaultComboBoxModel(binary));
+			}
+			else if(mainOption.getSelectedItem().equals("Angle")) {
+				option1.setModel(new javax.swing.DefaultComboBoxModel(angle));
+				option2.setModel(new javax.swing.DefaultComboBoxModel(angle));
+			}
 		}
 		
 		//Conversion button
 		if(e.getSource()==but[0]) {
 			try {
-				Double a = Double.parseDouble(op1.getText());
+				Double.parseDouble(op1.getText());
 				num=true;
 				lab[3].setText("");
 			}
